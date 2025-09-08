@@ -2,15 +2,12 @@
 
 namespace App\Http\Controllers;
 
-
 use Illuminate\Support\Facades\Auth; // Correct import for Auth facade
-// use Illuminate\Container\Attributes\Auth;
 use Illuminate\Http\Request;
 use App\Models\User;
 
 class AuthController extends Controller
 {
-
     // Register User
     public function register(Request $request)
     {
@@ -22,38 +19,38 @@ class AuthController extends Controller
         ]);
 
         // Register User
-
         $user = User::create($fields);
-        // $user = User::create($fields);
-
 
         Auth::login($user);
-        return redirect()->route('home');
+
+        // redirect to dashboard instead of home
+        return redirect()->route('dashboard');
     }
+
     // login
     public function login(Request $request)
     {
-        // dd('ok');
         $fields = $request->validate([
             'email' => ['required', 'max:255', 'email'],
             'password' => ['required'],
         ]);
 
-        // dd($request);
-    // try to login
-       if (Auth::attempt($fields, $request->remember)) {
-       return redirect()->intended('dashboard');
-       } 
-       else {
-            return redirect()->back()->withErrors(['failed' => 'The provided credentials does not match our record.'
-        ]);
+        // try to login
+        if (Auth::attempt($fields, $request->remember)) {
+            return redirect()->route('dashboard');
+        } else {
+            return redirect()->back()->withErrors([
+                'failed' => 'The provided credentials do not match our records.'
+            ]);
         }
     }
-    public function logout(Request $request){
-        // dd('ok');
+
+    public function logout(Request $request)
+    {
         Auth::logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
+
         return redirect('/');
     }
 }
