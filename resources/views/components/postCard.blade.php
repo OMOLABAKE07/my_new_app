@@ -15,6 +15,7 @@
                 {{-- text-body --}}
                 {{-- <p>{{ $post->body }}</p> --}}
                 {{-- this will give us the first 15 words of the post --}}
-                <p>{{ Str::words($post->body, 15) }}</p>
+                <span>{{ Str::words($post->body, 15) }}</span>
+                <a href="{{ route('posts.show') }}" class="text-blue-500 ml-2">Read more &rarr;</a>
             </div>
         </div>
