@@ -2,7 +2,7 @@
     <a href="{{ route('dashboard') }}" class="block mb-2 text-xs text-blue-500">&lAarr; Go back to your dashboard</a>
     <div class="card">
         <h2 class="font-bold mb-4">Update your post</h2>
-        <form action="{{ route('posts.update', $post) }}" method="post">
+        <form action="{{ route('posts.update', $post) }}" method="post" enctype="multipart/form-data">
             @csrf
             @method('PUT')
             <div class="mb-4">
@@ -28,8 +28,14 @@
                     <p class="error">{{ $message }}</p>
                 @enderror
             </div>
+            @if ($post->image)
+                <div class="h-64 rounded-md mb-4 w-1/4 object-cover overflow-hidden">
+                    <label>Current cover photo</label>
+                    <input type="file" name="image" id="image">
+                    <img src="{{ asset('storage/' . $post->image) }}" alt="">
+                </div>
+            @endif
             <button class="btn">Update</button>
         </form>
     </div>
-    </x-layout>
-   
+</x-layout>
