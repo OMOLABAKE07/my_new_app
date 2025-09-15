@@ -2,15 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use App\Mail\WelcomeMail;
 use App\Models\Post;
-use Illuminate\Contracts\Cache\Store;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
-use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 
 use function PHPUnit\Framework\returnSelf;
@@ -31,7 +28,6 @@ class PostController extends Controller implements HasMiddleware
      */
     public function index()
     {
-        // Mail::to('omolaadeoluwa0207@gmail.com')->send(new WelcomeMail(Auth::user()));
         // the variable $posts is an array of all the posts in the database in descending order of creation date
         // $posts = Post::orderBy('created_at', 'desc')->get();
         // $posts = Post::all();
@@ -53,31 +49,19 @@ class PostController extends Controller implements HasMiddleware
      */
     public function store(Request $request)
     {
-        //   dd('ok');
+        Storage::put('posts_images', $request->image);
+        // dd('ok');
+        // dd($request);
+      
         // validation
         $fields =  $request->validate([
             'title' => ['required', 'max:255'],
             'body' => ['required'],
-            'image' => ['nullable', 'file', 'max:3000', 'mimes:png, jpg, webp, jpeg']
         ]);
-
-        // Store image if exists
-        $path = null;
-        if ($request->hasFile('image')) {
-            $path = Storage::disk('public')->put('posts_images', $request->image);
-            //   dd($path);
-        }
 
 
         // Create a post
-        Auth::user()->posts()->create(
-            [
-                'title' => $request->title,
-                'body' => $request->body,
-                'image' => $path,
-            ]
-
-        );
+        Auth::user()->posts()->create($fields);
         //  Post::create(['user_id' => Auth::id(), ...$fields ]);
         return back()->with('success', 'Your post was created');
     }
@@ -111,28 +95,12 @@ class PostController extends Controller implements HasMiddleware
         $fields =  $request->validate([
             'title' => ['required', 'max:255'],
             'body' => ['required'],
-            'image' => ['nullable', 'file', 'max:3000', 'mimes:png,jpg,webp,jpeg'],
-
         ]);
 
-        $path = $post->image ?? null;
-        if ($request->hasFile('image')) {
-            if ($post->image) {
-                Storage::disk('public')->delete($post->image);
-            }
-            $path = Storage::disk('public')->put('posts_images', $request->image);
-            // dd($path);
-        }
+
         // Update a post
 
-        $post->update(
-            [
-                'title' => $request->title,
-                'body' => $request->body,
-                'image' => $path,
-            ]
-        );
-        // dd($post);
+        $post->update($fields);
         // return back()->route('dashboard')->with('success', 'Your post was updated');
         return redirect()->route('dashboard')->with('success', 'Your post was updated');
     }
@@ -144,10 +112,6 @@ class PostController extends Controller implements HasMiddleware
     {
         // Authorize Action
         Gate::authorize('modify', $post);
-
-        if ($post->image) {
-            Storage::disk('public')->delete($post->image);
-        }
         // dd('ok');
         $post->delete();
         return back()->with('delete', 'Your Post was deleted!');
