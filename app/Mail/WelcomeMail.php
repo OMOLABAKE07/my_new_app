@@ -32,11 +32,12 @@ class WelcomeMail extends Mailable
     {
         return new Envelope(
             subject: 'Welcome to laravel 11',
-            // from: 'greeting@example.com',
+         
+        );
+           // from: 'greeting@example.com',
             // replyTo: [
             //     new Address('greeting@example.com', 'Jon')
             // ],
-        );
     }
 
     /**

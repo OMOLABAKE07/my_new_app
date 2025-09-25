@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Support\Facades\Auth; // Correct import for Auth facade
 use Illuminate\Http\Request;
 use App\Models\User;
+use Illuminate\Auth\Events\Registered;
+use Illuminate\Foundation\Auth\EmailVerificationRequest;
 
 class AuthController extends Controller
 {
@@ -23,9 +25,28 @@ class AuthController extends Controller
 
         Auth::login($user);
 
+        event (new Registered($user));
+
         // redirect to dashboard instead of home
         return redirect()->route('dashboard');
     }
+
+    public function verifyNotice(){
+        return view('auth.verify-email');
+    }
+
+    public function verifyEmail(EmailVerificationRequest $request){
+        $request->fulfill();
+        return redirect()->route('dashboard');
+    }
+
+
+// Resending the verification Email route
+public function verifyHandler(Request $request) {
+    $request->user()->sendEmailVerificationNotification();
+ 
+    return back()->with('message', 'Verification link sent!');
+}
 
     // login
     public function login(Request $request)

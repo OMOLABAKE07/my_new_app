@@ -70,7 +70,7 @@ class PostController extends Controller implements HasMiddleware
 
 
         // Create a post
-        Auth::user()->posts()->create(
+      $post =  Auth::user()->posts()->create(
             [
                 'title' => $request->title,
                 'body' => $request->body,
@@ -78,6 +78,7 @@ class PostController extends Controller implements HasMiddleware
             ]
 
         );
+        Mail::to ( Auth::user())->send(new WelcomeMail (Auth::user(), $post));
         //  Post::create(['user_id' => Auth::id(), ...$fields ]);
         return back()->with('success', 'Your post was created');
     }

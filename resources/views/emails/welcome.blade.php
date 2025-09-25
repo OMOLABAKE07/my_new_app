@@ -2,5 +2,5 @@
 <div>
     <h2>You created {{ $post->title }}</h2>
     <p>{{ $post->body }}</p>
-    <img src="{{ $message->embed($post->image) }}" alt="">
+    <img width="250" src="{{ $message->embed('storage/' . $post->image) }}" alt="">
 </div>
